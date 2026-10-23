@@ -11,7 +11,7 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-find_package(SDL2 REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 
 add_executable(blank
 		main.cpp
@@ -20,5 +20,8 @@ add_executable(blank
 include(FindPkgConfig)
 
 target_include_directories(blank PUBLIC ${SDL2_INCLUDE_DIR})
-target_link_libraries(blank LINK_PUBLIC ${SDL2_LIBRARY} m)
-
+target_link_libraries(blank
+		PRIVATE
+		$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+		$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+)
