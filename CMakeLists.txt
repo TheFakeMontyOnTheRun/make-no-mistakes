@@ -21,10 +21,10 @@ include_directories(
 
 set(SRC_FILES
     src/main.cpp
-    src/game.c
-    src/player.c
-    src/projectile.c
-    src/util.c
+    src/game.cpp
+    src/player.cpp
+    src/projectile.cpp
+    src/util.cpp
 )
 
 add_executable(blank ${SRC_FILES})
