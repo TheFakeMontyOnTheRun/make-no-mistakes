@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PROJECTILE_H
+#define PROJECTILE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,3 +25,5 @@ void projectile_update(Projectile *projectile, float dt);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // PROJECTILE_H

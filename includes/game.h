@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,3 +32,5 @@ void game_cleanup(Game *game);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // GAME_H

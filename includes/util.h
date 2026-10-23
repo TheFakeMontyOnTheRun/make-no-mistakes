@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTIL_H
+#define UTIL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,3 +11,4 @@ void normalize_vector(float *x, float *y);
 }
 #endif
 
+#endif // UTIL_H

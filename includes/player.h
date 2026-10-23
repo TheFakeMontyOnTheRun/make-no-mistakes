@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,3 +29,5 @@ void player_update(Player *player, const Uint8 *key_state, float dt);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // PLAYER_H
