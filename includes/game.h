@@ -7,10 +7,17 @@
 #include "font.h"
 #include "player.h"
 #include "projectile.h"
+#include "timer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum Screen {
+    START_SCREEN,
+    GAME_LOOP_SCREEN,
+    GAME_OVER_SCREEN
+};
 
 typedef struct Game {
     SDL_Window *window;
@@ -27,17 +34,17 @@ typedef struct Game {
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
     int projectile_count;
-    int timer;
-    Uint64 start_time;
+    Timer timer;
+    Screen screen;
     bool keep_running;
     bool shoot_pressed;
-    bool show_initial_screen;
     float projectile_speed;
     Uint64 previous_ticks;
 } Game;
 
 void game_init(Game *game, const char *title, int width, int height);
 void game_handle_events(Game *game);
+void game_change_screen(Game *game);
 void game_update(Game *game, float dt);
 void game_render(Game *game);
 void game_cleanup(Game *game);
