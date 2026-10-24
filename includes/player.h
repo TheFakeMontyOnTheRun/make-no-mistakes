@@ -20,6 +20,9 @@ typedef struct Player {
     float velocity_y;
     float facing_x;
     float facing_y;
+    int sprite_frame;
+    float animation_time;
+    bool moving;
 } Player;
 
 void player_init(Player *player, float x, float y, float speed, float width, float height);

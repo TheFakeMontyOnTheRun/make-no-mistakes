@@ -1,13 +1,16 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
+#include "constants.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdbool.h>
 
-#define MAX_PROJECTILES 32
+
+#define MAX_PROJECTILES constants::projectile::kMaxProjectiles
 
 typedef struct Projectile {
     float x;

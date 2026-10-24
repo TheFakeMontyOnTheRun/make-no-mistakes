@@ -22,7 +22,7 @@ typedef struct Game {
 
     SDL_Texture *crate_texture;
     SDL_Rect crate_rect;
-
+    SDL_Texture *player_direction_textures[8];
     Font font;
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
