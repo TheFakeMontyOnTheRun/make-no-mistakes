@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <SDL_image.h>
 #include <stdio.h>
 
 static void fire_projectile(Game *game) {
@@ -73,6 +74,20 @@ void game_init(Game *game, const char *title, int width, int height) {
         return;
     }
 
+    game->bg_battle_texture = IMG_LoadTexture(
+        game->renderer, "assets/bg/battle_area.png"
+    );
+    game->bg_battle = {
+        0, 0, 1100, 900
+    };
+
+    game->bg_puzzle_texture = IMG_LoadTexture(
+        game->renderer, "assets/bg/puzzle_area.png"
+    );
+    game->bg_puzzle = {
+        1100, 0, 500, 900
+    };
+
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     player_init(&game->player, 100.0f, 100.0f, 180.0f, 32.0f, 32.0f);
     game->projectile_count = 0;
@@ -95,9 +110,13 @@ void game_handle_events(Game *game) {
         }
 
         if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                game->keep_running = false;
+            }
             if (event.key.keysym.sym == SDLK_SPACE) {
                 if (game->show_initial_screen) {
                     game->show_initial_screen = false;
+                    SDL_SetWindowMouseRect(game->window, &game->bg_puzzle);
                 } else {
                     game->shoot_pressed = true;
                 }
@@ -145,10 +164,10 @@ void game_render(Game *game) {
         font_render(&game->font, game->renderer, "Press SPACE to start", 300, 2.0f);
     } else {
         SDL_Rect player_rect = {
-            (int)game->player.x,
-            (int)game->player.y,
-            (int)game->player.width,
-            (int)game->player.height
+            (int) game->player.x,
+            (int) game->player.y,
+            (int) game->player.width,
+            (int) game->player.height
         };
 
         SDL_SetRenderDrawColor(game->renderer, 80, 200, 120, 255);
@@ -156,15 +175,28 @@ void game_render(Game *game) {
 
         for (int i = 0; i < game->projectile_count; ++i) {
             SDL_Rect shot = {
-                (int)(game->projectiles[i].x - game->projectiles[i].radius),
-                (int)(game->projectiles[i].y - game->projectiles[i].radius),
-                (int)(game->projectiles[i].radius * 2.0f),
-                (int)(game->projectiles[i].radius * 2.0f)
+                (int) (game->projectiles[i].x - game->projectiles[i].radius),
+                (int) (game->projectiles[i].y - game->projectiles[i].radius),
+                (int) (game->projectiles[i].radius * 2.0f),
+                (int) (game->projectiles[i].radius * 2.0f)
             };
 
             SDL_SetRenderDrawColor(game->renderer, 255, 200, 80, 255);
             SDL_RenderFillRect(game->renderer, &shot);
         }
+
+        SDL_RenderCopy(
+            game->renderer,
+            game->bg_battle_texture,
+            nullptr,
+            &game->bg_battle
+        );
+        SDL_RenderCopy(
+            game->renderer,
+            game->bg_puzzle_texture,
+            nullptr,
+            &game->bg_puzzle
+        );
     }
 
     SDL_RenderPresent(game->renderer);
@@ -185,6 +217,7 @@ void game_cleanup(Game *game) {
         game->window = nullptr;
     }
 
+    font_cleanup(&game->font);
+
     SDL_Quit();
 }
-

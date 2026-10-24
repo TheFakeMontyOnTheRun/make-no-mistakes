@@ -1,13 +1,15 @@
 #include <SDL.h>
 
 #include "game.h"
+#include "config.h"
 
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
     Game game;
-    game_init(&game, "Make no Mistakes", 640, 480);
+    Config config;
+    game_init(&game, "Make no Mistakes", config.screen_width, config.screen_height);
 
     if (!game.window || !game.renderer) {
         return 1;

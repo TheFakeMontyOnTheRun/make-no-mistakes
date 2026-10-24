@@ -15,6 +15,11 @@ extern "C" {
 typedef struct Game {
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_Texture *bg_battle_texture;
+    SDL_Texture *bg_puzzle_texture;
+    SDL_Rect bg_battle;
+    SDL_Rect bg_puzzle;
+
     Font font;
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
