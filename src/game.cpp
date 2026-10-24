@@ -1,5 +1,6 @@
 #include "game.h"
 #include "util.h"
+#include "EnemySpawner.hpp"
 
 #include <SDL_image.h>
 #include <stdio.h>
@@ -7,6 +8,7 @@
 bool dragging = false;
 int offset_x = 0;
 int offset_y = 0;
+EnemySpawner *enemySpawner;
 
 static void fire_projectile(Game *game) {
     if (!game || game->projectile_count >= MAX_PROJECTILES) {
@@ -113,6 +115,9 @@ void game_init(Game *game, const char *title, int width, int height) {
     game->show_initial_screen = true;
     game->projectile_speed = 280.0f;
     game->previous_ticks = SDL_GetPerformanceCounter();
+    enemySpawner = new EnemySpawner(2, [](Enemy* foe){
+		printf("Spawn!\n");
+	});
 }
 
 void game_handle_events(Game *game) {
@@ -179,6 +184,12 @@ void game_update(Game *game, float dt) {
     if (!game) {
         return;
     }
+
+    if (!enemySpawner) {
+		return;
+    }
+
+    enemySpawner->update(dt);
 
     const Uint8 *keyboard_state = SDL_GetKeyboardState(nullptr);
     player_update(&game->player, keyboard_state, dt);

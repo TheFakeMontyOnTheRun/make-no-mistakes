@@ -22,6 +22,7 @@ set(SRC_FILES
     src/projectile.cpp
     src/util.cpp
     src/font.cpp
+	src/EnemySpawner.cpp
 )
 
 add_executable(blank ${SRC_FILES})
