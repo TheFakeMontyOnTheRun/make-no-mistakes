@@ -47,6 +47,12 @@ void game_init(Game *game, const char *title, const int width, const int height)
         return;
     }
 
+    if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) == 0) {
+        fprintf(stderr, "Cannot init SDL_image: %s\n", IMG_GetError());
+        SDL_Quit();
+        return;
+    }
+
     game->window = SDL_CreateWindow(
         title,
         SDL_WINDOWPOS_CENTERED,
@@ -316,7 +322,6 @@ void game_render(Game *game) {
                     constants::hud::HUD_SCALE,
                     false,
                     false);
-
         if (remaining_time <= 0) {
             game_change_screen(game);
         }
