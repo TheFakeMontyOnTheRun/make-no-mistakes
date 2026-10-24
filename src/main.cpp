@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <ctime>
 
 #include "game.h"
 #include "config.h"
@@ -7,6 +8,7 @@ int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
+    srand(time(NULL));
     Game game;
     Config config;
     game_init(&game, "Make no Mistakes", config.screen_width, config.screen_height);

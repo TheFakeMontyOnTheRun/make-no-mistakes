@@ -5,10 +5,13 @@
 #include <SDL_image.h>
 #include <stdio.h>
 
+#include <vector>
+
 bool dragging = false;
 int offset_x = 0;
 int offset_y = 0;
 EnemySpawner *enemySpawner;
+std::vector<Enemy*> enemies;
 
 static void fire_projectile(Game *game) {
     if (!game || game->projectile_count >= MAX_PROJECTILES) {
@@ -115,8 +118,8 @@ void game_init(Game *game, const char *title, int width, int height) {
     game->show_initial_screen = true;
     game->projectile_speed = 280.0f;
     game->previous_ticks = SDL_GetPerformanceCounter();
-    enemySpawner = new EnemySpawner(2, [](Enemy* foe){
-		printf("Spawn!\n");
+    enemySpawner = new EnemySpawner(game->renderer, 2, [](Enemy *foe) {
+		enemies.emplace_back(foe);
 	});
 }
 
@@ -264,7 +267,20 @@ void game_render(Game *game) {
         const int remaining_time = game->timer - (SDL_GetTicks64() - game->start_time) / 1000.0f;
         font_render(&game->font, game->renderer, "Time: " + std::to_string(remaining_time), 10, 1.5f, START);
         font_render(&game->font, game->renderer, "Enemies: 5", 30, 1.5f, START);
+    }
 
+    for (const auto &foe : enemies) {
+
+		SDL_Rect foe_head  = {(int)foe->m_x, (int)foe->m_y +  0, (int)32, (int)32};
+        SDL_Rect foe_neck  = {(int)foe->m_x, (int)foe->m_y + 10, (int)32, (int)32};
+        SDL_Rect foe_belly = {(int)foe->m_x, (int)foe->m_y + 32, (int)32, (int)32};
+        SDL_Rect foe_legs  = {(int)foe->m_x, (int)foe->m_y + 64, (int)32, (int)32};
+
+        SDL_RenderCopy(game->renderer, foe->m_neck, nullptr, &foe_neck);
+        SDL_RenderCopy(game->renderer, foe->m_belly, nullptr, &foe_belly);
+        SDL_RenderCopy(game->renderer, foe->m_legs, nullptr, &foe_legs);
+
+        SDL_RenderCopy(game->renderer, foe->m_head, nullptr, &foe_head);
     }
 
     SDL_RenderPresent(game->renderer);
