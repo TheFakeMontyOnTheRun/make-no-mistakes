@@ -313,6 +313,8 @@ void game_init(Game *game, const char *title, int width, int height) {
     game->shoot_pressed = false;
     game->show_initial_screen = true;
     game->projectile_speed = constants::projectile::kSpeed;
+    game->shoot_cooldown = 0.18f;
+    game->shoot_timer = 0.0f;
     game->previous_ticks = SDL_GetPerformanceCounter();
 }
 
@@ -385,7 +387,13 @@ void game_update(Game *game, float dt) {
     player_update(&game->player, keyboard_state, dt);
 
     if (game->shoot_pressed && (keyboard_state[SDL_SCANCODE_SPACE] || keyboard_state[SDL_SCANCODE_KP_0])) {
-        fire_projectile(game);
+        game->shoot_timer -= dt;
+        if (game->shoot_timer <= 0.0f) {
+            game->shoot_timer = game->shoot_cooldown;
+            fire_projectile(game);
+        }
+    } else {
+        game->shoot_timer = 0.0f;
     }
 
     for (int i = 0; i < game->projectile_count; ++i) {

@@ -43,7 +43,7 @@ constexpr float kProjectileSpawnOffset = 22.0f;
 } // namespace player
 
 namespace projectile {
-constexpr int kMaxProjectiles = 32;
+constexpr int kMaxProjectiles = 5;
 constexpr float kSpeed = 500.0f;
 constexpr float kRadius = 3.0f;
 } // namespace projectile
@@ -76,9 +76,9 @@ constexpr int kFallbackPlayerR = 80;
 constexpr int kFallbackPlayerG = 200;
 constexpr int kFallbackPlayerB = 120;
 
-constexpr int kProjectileR = 255;
-constexpr int kProjectileG = 200;
-constexpr int kProjectileB = 80;
+constexpr int kProjectileR = 29;
+constexpr int kProjectileG = 206;
+constexpr int kProjectileB = 2;
 
 constexpr int kCheckerboardThreshold = 180;
 constexpr int kCheckerboardTolerance = 18;

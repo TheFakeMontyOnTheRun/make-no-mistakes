@@ -33,6 +33,8 @@ typedef struct Game {
     bool shoot_pressed;
     bool show_initial_screen;
     float projectile_speed;
+    float shoot_cooldown;
+    float shoot_timer;
     Uint64 previous_ticks;
 } Game;
 
