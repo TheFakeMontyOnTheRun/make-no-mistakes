@@ -19,6 +19,8 @@ typedef struct Game {
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
     int projectile_count;
+    int timer;
+    Uint64 start_time;
     bool keep_running;
     bool shoot_pressed;
     bool show_initial_screen;

@@ -76,6 +76,8 @@ void game_init(Game *game, const char *title, int width, int height) {
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     player_init(&game->player, 100.0f, 100.0f, 180.0f, 32.0f, 32.0f);
     game->projectile_count = 0;
+    game->timer = 60;
+    game->start_time = 0;
     game->keep_running = true;
     game->shoot_pressed = false;
     game->show_initial_screen = true;
@@ -98,6 +100,7 @@ void game_handle_events(Game *game) {
             if (event.key.keysym.sym == SDLK_SPACE) {
                 if (game->show_initial_screen) {
                     game->show_initial_screen = false;
+                    game->start_time = SDL_GetTicks64();
                 } else {
                     game->shoot_pressed = true;
                 }
@@ -165,6 +168,10 @@ void game_render(Game *game) {
             SDL_SetRenderDrawColor(game->renderer, 255, 200, 80, 255);
             SDL_RenderFillRect(game->renderer, &shot);
         }
+
+        const int remaining_time = game->timer - (SDL_GetTicks64() - game->start_time) / 1000.0f;
+        font_render(&game->font, game->renderer, "Time: " + std::to_string(remaining_time), 10, 1.5f, START);
+        font_render(&game->font, game->renderer, "Enemies: 5", 30, 1.5f, START);
     }
 
     SDL_RenderPresent(game->renderer);
@@ -184,6 +191,8 @@ void game_cleanup(Game *game) {
         SDL_DestroyWindow(game->window);
         game->window = nullptr;
     }
+
+    font_cleanup(&game->font);
 
     SDL_Quit();
 }

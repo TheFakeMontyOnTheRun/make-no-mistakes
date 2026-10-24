@@ -51,7 +51,7 @@ void font_init(Font* font, const std::string& filepath, SDL_Renderer* renderer)
     }
 }
 
-void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, int y, float scale)
+void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, int y, float scale, TextAlign align)
 {
     if (!font || !renderer || text.empty()) {
         return;
@@ -79,7 +79,12 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
         }
     }
 
-    int draw_x = (window_width - text_width) / 2;
+    int draw_x = 0;
+    if (align == CENTER) {
+        draw_x = (window_width - text_width) / 2;
+    } else {
+        draw_x = 50;
+    }
     const int draw_y = y;
 
     for (const char ch : text) {
