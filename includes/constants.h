@@ -39,7 +39,7 @@ constexpr float kCollisionWidth = 32.0f;
 constexpr float kCollisionHeight = 32.0f;
 constexpr int kRenderWidth = 64;
 constexpr int kRenderHeight = 64;
-constexpr float kProjectileSpawnOffset = 18.0f;
+constexpr float kProjectileSpawnOffset = 22.0f;
 } // namespace player
 
 namespace projectile {
