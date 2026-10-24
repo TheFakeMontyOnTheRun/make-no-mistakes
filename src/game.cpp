@@ -1,7 +1,12 @@
 #include "game.h"
+#include "util.h"
 
 #include <SDL_image.h>
 #include <stdio.h>
+
+bool dragging = false;
+int offset_x = 0;
+int offset_y = 0;
 
 static void fire_projectile(Game *game) {
     if (!game || game->projectile_count >= MAX_PROJECTILES) {
@@ -88,6 +93,16 @@ void game_init(Game *game, const char *title, int width, int height) {
         1100, 0, 500, 900
     };
 
+    game->crate_texture = IMG_LoadTexture(
+        game->renderer, "assets/obj/crate.png"
+        );
+
+    game->crate_rect = {
+        randomNumber(1150, 1550),
+        randomNumber(50, 850),
+        64, 64
+    };
+
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     player_init(&game->player, 100.0f, 100.0f, 180.0f, 32.0f, 32.0f);
     game->projectile_count = 0;
@@ -130,6 +145,32 @@ void game_handle_events(Game *game) {
             if (event.key.keysym.sym == SDLK_SPACE) {
                 game->shoot_pressed = false;
             }
+        }
+
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                int mouse_x = event.button.x;
+                int mouse_y = event.button.y;
+
+                if (mouse_x >= game->crate_rect.x && mouse_x <= game->crate_rect.x + game->crate_rect.w &&
+                    mouse_y >= game->crate_rect.y && mouse_y <= game->crate_rect.y + game->crate_rect.h)
+                {
+                    dragging = true;
+                    offset_x = mouse_x - game->crate_rect.x;
+                    offset_y = mouse_y - game->crate_rect.y;
+                }
+            }
+        }
+
+        if (event.type == SDL_MOUSEBUTTONUP) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                dragging = false;
+            }
+        }
+
+        if (event.type == SDL_MOUSEMOTION && dragging) {
+            game->crate_rect.x = event.motion.x - offset_x;
+            game->crate_rect.y = event.motion.y - offset_y;
         }
     }
 }
@@ -188,6 +229,13 @@ void game_render(Game *game) {
             SDL_RenderFillRect(game->renderer, &shot);
         }
 
+
+        SDL_RenderCopy(
+            game->renderer,
+            game->crate_texture,
+            nullptr,
+            &game->crate_rect
+        );
 
         SDL_RenderCopy(
             game->renderer,
