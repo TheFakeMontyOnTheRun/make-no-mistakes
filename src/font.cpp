@@ -8,6 +8,8 @@
 
 #include <unordered_map>
 
+#include "constants.h"
+
 namespace {
 
 struct FontPos {
@@ -30,10 +32,6 @@ const std::unordered_map<char, FontPos> kGlyphMap = {
     {'3', {40, 40}}, {'4', {48, 40}}, {'5', {56, 40}}, {'6', {64, 40}}, {'7', {72, 40}},
     {'8', {0, 48}}, {'9', {8, 48}}
 };
-
-const int kGlyphSize = 8;
-const int kGlyphSpacing = 1;
-const int kSpaceWidth = 4;
 
 } // namespace
 
@@ -65,35 +63,38 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
         return;
     }
 
-    int text_width, window_width, window_height = 0;
+    int text_width = 0;
+    int window_width = 0;
+    int window_height = 0;
     SDL_GetRendererOutputSize(renderer, &window_width, &window_height);
     for (const char ch : text) {
         if (ch == ' ') {
-            text_width += static_cast<int>(kSpaceWidth * scale);
+            text_width += static_cast<int>(constants::font::SPACE_WIDTH * scale);
             continue;
         }
 
         const auto it = kGlyphMap.find(ch);
         if (it != kGlyphMap.end()) {
-            text_width += static_cast<int>((kGlyphSize + kGlyphSpacing) * scale);
+            text_width += static_cast<int>((constants::font::GLYPH_SIZE + constants::font::GLYPH_SPACING) * scale);
         }
     }
 
-    int draw_x, draw_y = 0;
+    int draw_x = 0;
+    int draw_y = 0;
     if (center_x) {
         draw_x = (window_width - text_width) / 2;
     } else {
         draw_x = x;
     }
     if (center_y) {
-        draw_y = (window_height - static_cast<int>(kGlyphSize * scale)) / 2;
+        draw_y = (window_height - static_cast<int>(constants::font::GLYPH_SIZE * scale)) / 2;
     } else {
         draw_y = y;
     }
 
     for (const char ch : text) {
         if (ch == ' ') {
-            draw_x += static_cast<int>(kSpaceWidth * scale);
+            draw_x += static_cast<int>(constants::font::SPACE_WIDTH * scale);
             continue;
         }
 
@@ -103,16 +104,21 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
         }
 
         const FontPos glyph = it->second;
-        const SDL_Rect src = { glyph.x, glyph.y, kGlyphSize, kGlyphSize };
+        const SDL_Rect src = {
+            glyph.x,
+            glyph.y,
+            constants::font::GLYPH_SIZE,
+            constants::font::GLYPH_SIZE
+        };
         const SDL_Rect dst = {
             draw_x,
             draw_y,
-            static_cast<int>(kGlyphSize * scale),
-            static_cast<int>(kGlyphSize * scale)
+            static_cast<int>(constants::font::GLYPH_SIZE * scale),
+            static_cast<int>(constants::font::GLYPH_SIZE * scale)
         };
 
         SDL_RenderCopy(renderer, font->texture, &src, &dst);
-        draw_x += static_cast<int>((kGlyphSize + kGlyphSpacing) * scale);
+        draw_x += static_cast<int>((constants::font::GLYPH_SIZE + constants::font::GLYPH_SPACING) * scale);
     }
 }
 

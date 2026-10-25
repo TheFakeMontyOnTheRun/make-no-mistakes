@@ -29,7 +29,7 @@ typedef struct Game {
 
     SDL_Texture *crate_texture;
     SDL_Rect crate_rect;
-
+    SDL_Texture *player_direction_textures[8];
     Font font;
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
@@ -38,7 +38,10 @@ typedef struct Game {
     Screen screen;
     bool keep_running;
     bool shoot_pressed;
+    bool show_initial_screen;
     float projectile_speed;
+    float shoot_cooldown;
+    float shoot_timer;
     Uint64 previous_ticks;
 } Game;
 
