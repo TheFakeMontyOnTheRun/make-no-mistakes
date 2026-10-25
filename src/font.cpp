@@ -68,13 +68,13 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
     SDL_GetRendererOutputSize(renderer, &window_width, nullptr);
     for (const char ch : text) {
         if (ch == ' ') {
-            text_width += static_cast<int>(constants::font::kSpaceWidth * scale);
+            text_width += static_cast<int>(constants::font::SPACE_WIDTH * scale);
             continue;
         }
 
         const auto it = kGlyphMap.find(ch);
         if (it != kGlyphMap.end()) {
-            text_width += static_cast<int>((constants::font::kGlyphSize + constants::font::kGlyphSpacing) * scale);
+            text_width += static_cast<int>((constants::font::GLYPH_SIZE + constants::font::GLYPH_SPACING) * scale);
         }
     }
 
@@ -82,13 +82,13 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
     if (align == CENTER) {
         draw_x = (window_width - text_width) / 2;
     } else {
-        draw_x = constants::font::kDefaultStartX;
+        draw_x = constants::font::DEFAULT_START_X;
     }
     const int draw_y = y;
 
     for (const char ch : text) {
         if (ch == ' ') {
-            draw_x += static_cast<int>(constants::font::kSpaceWidth * scale);
+            draw_x += static_cast<int>(constants::font::SPACE_WIDTH * scale);
             continue;
         }
 
@@ -101,18 +101,18 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
         const SDL_Rect src = {
             glyph.x,
             glyph.y,
-            constants::font::kGlyphSize,
-            constants::font::kGlyphSize
+            constants::font::GLYPH_SIZE,
+            constants::font::GLYPH_SIZE
         };
         const SDL_Rect dst = {
             draw_x,
             draw_y,
-            static_cast<int>(constants::font::kGlyphSize * scale),
-            static_cast<int>(constants::font::kGlyphSize * scale)
+            static_cast<int>(constants::font::GLYPH_SIZE * scale),
+            static_cast<int>(constants::font::GLYPH_SIZE * scale)
         };
 
         SDL_RenderCopy(renderer, font->texture, &src, &dst);
-        draw_x += static_cast<int>((constants::font::kGlyphSize + constants::font::kGlyphSpacing) * scale);
+        draw_x += static_cast<int>((constants::font::GLYPH_SIZE + constants::font::GLYPH_SPACING) * scale);
     }
 }
 

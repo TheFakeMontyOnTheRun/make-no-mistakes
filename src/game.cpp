@@ -9,209 +9,9 @@
 #include <string>
 #include <vector>
 
-namespace {
-
-const int kPlayerDirections = 8;
-
-const char* kPlayerDirectionNames[kPlayerDirections] = {
-    "north", "northeast", "east", "southeast",
-    "south", "southwest", "west", "northwest"
-};
-
-bool is_checkerboard_pixel(Uint8 red, Uint8 green, Uint8 blue) {
-    const Uint8 brightest = std::max(red, std::max(green, blue));
-    const Uint8 darkest = std::min(red, std::min(green, blue));
-    return brightest >= constants::visual::kCheckerboardThreshold &&
-           brightest - darkest <= constants::visual::kCheckerboardTolerance;
-}
-
-void remove_checkerboard_background(SDL_Surface* surface) {
-    const int pixel_count = surface->w * surface->h;
-    auto* pixels = static_cast<Uint32*>(surface->pixels);
-    std::vector<bool> transparent(pixel_count, false);
-    std::vector<int> pending;
-
-    const auto try_add = [&](int x, int y) {
-        const int index = y * surface->w + x;
-        if (transparent[index]) {
-            return;
-        }
-
-        Uint8 red;
-        Uint8 green;
-        Uint8 blue;
-        Uint8 alpha;
-        const int pixel_index = y * surface->pitch / sizeof(Uint32) + x;
-        SDL_GetRGBA(pixels[pixel_index], surface->format, &red, &green, &blue, &alpha);
-        if (is_checkerboard_pixel(red, green, blue)) {
-            transparent[index] = true;
-            pending.push_back(index);
-        }
-    };
-
-    for (int x = 0; x < surface->w; ++x) {
-        try_add(x, 0);
-        try_add(x, surface->h - 1);
-    }
-    for (int y = 1; y < surface->h - 1; ++y) {
-        try_add(0, y);
-        try_add(surface->w - 1, y);
-    }
-
-    for (size_t current = 0; current < pending.size(); ++current) {
-        const int index = pending[current];
-        const int x = index % surface->w;
-        const int y = index / surface->w;
-        const int neighbors[][2] = {{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}};
-
-        for (const auto& neighbor : neighbors) {
-            if (neighbor[0] >= 0 && neighbor[0] < surface->w &&
-                neighbor[1] >= 0 && neighbor[1] < surface->h) {
-                try_add(neighbor[0], neighbor[1]);
-            }
-        }
-    }
-
-    for (int y = 0; y < surface->h; ++y) {
-        for (int x = 0; x < surface->w; ++x) {
-            const int index = y * surface->w + x;
-            if (transparent[index]) {
-                Uint8 red;
-                Uint8 green;
-                Uint8 blue;
-                Uint8 alpha;
-                const int pixel_index = y * surface->pitch / sizeof(Uint32) + x;
-                SDL_GetRGBA(pixels[pixel_index], surface->format, &red, &green, &blue, &alpha);
-                pixels[pixel_index] = SDL_MapRGBA(surface->format, red, green, blue, 0);
-            }
-        }
-    }
-}
-
-SDL_Surface* load_asset(const char* relative_path, std::string* loaded_path) {
-    char* base_path = SDL_GetBasePath();
-    if (base_path) {
-        const std::string executable_asset_path = std::string(base_path) + relative_path;
-        SDL_free(base_path);
-
-        SDL_Surface* surface = IMG_Load(executable_asset_path.c_str());
-        if (surface) {
-            if (loaded_path) {
-                *loaded_path = executable_asset_path;
-            }
-            return surface;
-        }
-    }
-
-    SDL_Surface* surface = IMG_Load(relative_path);
-    if (surface) {
-        if (loaded_path) {
-            *loaded_path = relative_path;
-        }
-        return surface;
-    }
-
-    return nullptr;
-}
-
-SDL_Texture* load_player_texture(SDL_Renderer* renderer, const char* filepath) {
-    std::string loaded_path;
-    SDL_Surface* loaded_surface = load_asset(filepath, &loaded_path);
-    if (!loaded_surface) {
-        fprintf(stderr, "Cannot read player asset '%s': %s\n", filepath, IMG_GetError());
-        return nullptr;
-    }
-
-    SDL_Surface* surface = SDL_ConvertSurfaceFormat(loaded_surface, SDL_PIXELFORMAT_RGBA32, 0);
-    SDL_FreeSurface(loaded_surface);
-    if (!surface) {
-        fprintf(stderr, "Cannot convert player asset '%s': %s\n",
-                loaded_path.c_str(), SDL_GetError());
-        return nullptr;
-    }
-
-    if (surface->w <= 0 || surface->h <= 0) {
-        fprintf(stderr, "Player image is empty in '%s'\n", loaded_path.c_str());
-        SDL_FreeSurface(surface);
-        return nullptr;
-    }
-
-    if (SDL_MUSTLOCK(surface)) {
-        SDL_LockSurface(surface);
-    }
-
-    remove_checkerboard_background(surface);
-
-    if (SDL_MUSTLOCK(surface)) {
-        SDL_UnlockSurface(surface);
-    }
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    if (texture) {
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    } else {
-        fprintf(stderr, "Cannot create player texture from '%s': %s\n",
-                loaded_path.c_str(), SDL_GetError());
-    }
-    return texture;
-}
-
-} // namespace
-
 bool dragging = false;
 int offset_x = 0;
 int offset_y = 0;
-
-static void fire_projectile(Game *game) {
-    if (!game || game->projectile_count >= MAX_PROJECTILES) {
-        return;
-    }
-
-    const float spawn_x = game->player.x + (game->player.width * constants::math::kHalf) +
-                          (game->player.facing_x * constants::player::kProjectileSpawnOffset);
-    const float spawn_y = game->player.y + (game->player.height * constants::math::kHalf) +
-                          (game->player.facing_y * constants::player::kProjectileSpawnOffset);
-
-    Projectile *shot = &game->projectiles[game->projectile_count];
-    projectile_init(
-        shot,
-        spawn_x,
-        spawn_y,
-        game->player.facing_x,
-        game->player.facing_y,
-        game->projectile_speed
-    );
-
-    game->projectile_count++;
-}
-
-static void cleanup_inactive_projectiles(Game *game) {
-    // Projectiles are confined to the combat area and should not enter puzzle UI space.
-    const int world_left = game->bg_battle.x;
-    const int world_top = game->bg_battle.y;
-    const int world_right = game->bg_battle.x + game->bg_battle.w;
-    const int world_bottom = game->bg_battle.y + game->bg_battle.h;
-
-    int active_count = 0;
-
-    for (int i = 0; i < game->projectile_count; ++i) {
-        Projectile *projectile = &game->projectiles[i];
-
-        if (projectile->x + projectile->radius < world_left ||
-            projectile->x - projectile->radius > world_right ||
-            projectile->y + projectile->radius < world_top ||
-            projectile->y - projectile->radius > world_bottom) {
-            projectile->active = false;
-        }
-
-        if (projectile->active) {
-            game->projectiles[active_count++] = *projectile;
-        }
-    }
-
-    game->projectile_count = active_count;
-}
 
 void game_init(Game *game, const char *title, int width, int height) {
     if (!game) {
@@ -220,7 +20,7 @@ void game_init(Game *game, const char *title, int width, int height) {
 
     game->window = nullptr;
     game->renderer = nullptr;
-    for (int i = 0; i < kPlayerDirections; ++i) {
+    for (int i = 0; i < PLAYER_DIRECTION_COUNT; ++i) {
         game->player_direction_textures[i] = nullptr;
     }
 
@@ -264,55 +64,55 @@ void game_init(Game *game, const char *title, int width, int height) {
         game->renderer, "assets/bg/battle_area.png"
     );
     game->bg_battle = {
-        constants::world::kBattleX,
-        constants::world::kBattleY,
-        constants::world::kBattleWidth,
-        constants::world::kBattleHeight
+        constants::world::BATTLE_X,
+        constants::world::BATTLE_Y,
+        constants::world::BATTLE_WIDTH,
+        constants::world::BATTLE_HEIGHT
     };
 
     game->bg_puzzle_texture = IMG_LoadTexture(
         game->renderer, "assets/bg/puzzle_area.png"
     );
     game->bg_puzzle = {
-        constants::world::kPuzzleX,
-        constants::world::kPuzzleY,
-        constants::world::kPuzzleWidth,
-        constants::world::kPuzzleHeight
+        constants::world::PUZZLE_X,
+        constants::world::PUZZLE_Y,
+        constants::world::PUZZLE_WIDTH,
+        constants::world::PUZZLE_HEIGHT
     };
 
     game->crate_texture = IMG_LoadTexture(
         game->renderer, "assets/obj/crate.png"
-        );
+    );
 
     game->crate_rect = {
-        randomNumber(constants::world::kCrateMinX, constants::world::kCrateMaxX),
-        randomNumber(constants::world::kCrateMinY, constants::world::kCrateMaxY),
-        constants::world::kCrateSize,
-        constants::world::kCrateSize
+        randomNumber(constants::world::CRATE_MIN_X, constants::world::CRATE_MAX_X),
+        randomNumber(constants::world::CRATE_MIN_Y, constants::world::CRATE_MAX_Y),
+        constants::world::CRATE_SIZE,
+        constants::world::CRATE_SIZE
     };
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
-    for (int direction = 0; direction < kPlayerDirections; ++direction) {
+    for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
         char path[128];
         snprintf(path, sizeof(path), "assets/player/directions/%s_0.png",
-                 kPlayerDirectionNames[direction]);
+                 PLAYER_DIRECTION_NAMES[direction]);
         game->player_direction_textures[direction] =
             load_player_texture(game->renderer, path);
     }
 
     player_init(&game->player,
-                constants::player::kStartX,
-                constants::player::kStartY,
-                constants::player::kSpeed,
-                constants::player::kCollisionWidth,
-                constants::player::kCollisionHeight);
+                constants::player::START_X,
+                constants::player::START_Y,
+                constants::player::SPEED,
+                constants::player::COLLISION_WIDTH,
+                constants::player::COLLISION_HEIGHT);
     game->projectile_count = 0;
-    game->timer = constants::hud::kTimerSeconds;
+    game->timer = constants::hud::TIMER_SECONDS;
     game->start_time = 0;
     game->keep_running = true;
     game->shoot_pressed = false;
     game->show_initial_screen = true;
-    game->projectile_speed = constants::projectile::kSpeed;
+    game->projectile_speed = constants::projectile::SPEED;
     game->shoot_cooldown = 0.18f;
     game->shoot_timer = 0.0f;
     game->previous_ticks = SDL_GetPerformanceCounter();
@@ -409,25 +209,25 @@ void game_render(Game *game) {
     }
 
     SDL_SetRenderDrawColor(game->renderer,
-                           constants::visual::kBackgroundR,
-                           constants::visual::kBackgroundG,
-                           constants::visual::kBackgroundB,
+                           constants::visual::BACKGROUND_R,
+                           constants::visual::BACKGROUND_G,
+                           constants::visual::BACKGROUND_B,
                            255);
     SDL_RenderClear(game->renderer);
 
     if (game->show_initial_screen) {
         font_render(&game->font, game->renderer,
                     "Make No Mistakes",
-                    constants::hud::kInitialTitleY,
-                    constants::hud::kInitialTitleScale);
+                    constants::hud::INITIAL_TITLE_Y,
+                    constants::hud::INITIAL_TITLE_SCALE);
         font_render(&game->font, game->renderer,
                     "Use WASD to move SPACE to shoot",
-                    constants::hud::kInitialInstructionsY,
-                    constants::hud::kInitialTextScale);
+                    constants::hud::INITIAL_INSTRUCTIONS_Y,
+                    constants::hud::INITIAL_TEXT_SCALE);
         font_render(&game->font, game->renderer,
                     "Press SPACE to start",
-                    constants::hud::kInitialStartY,
-                    constants::hud::kInitialTextScale);
+                    constants::hud::INITIAL_START_Y,
+                    constants::hud::INITIAL_TEXT_SCALE);
     } else {
         SDL_RenderCopy(game->renderer, game->bg_battle_texture, nullptr, &game->bg_battle);
         SDL_RenderCopy(game->renderer, game->bg_puzzle_texture, nullptr, &game->bg_puzzle);
@@ -435,8 +235,8 @@ void game_render(Game *game) {
         SDL_Rect player_rect = {
             (int)game->player.x,
             (int)game->player.y,
-            constants::player::kRenderWidth,
-            constants::player::kRenderHeight
+            constants::player::RENDER_WIDTH,
+            constants::player::RENDER_HEIGHT
         };
 
         SDL_Texture* player_texture =
@@ -445,9 +245,9 @@ void game_render(Game *game) {
             SDL_RenderCopy(game->renderer, player_texture, nullptr, &player_rect);
         } else {
             SDL_SetRenderDrawColor(game->renderer,
-                                   constants::visual::kFallbackPlayerR,
-                                   constants::visual::kFallbackPlayerG,
-                                   constants::visual::kFallbackPlayerB,
+                                   constants::visual::FALLBACK_PLAYER_R,
+                                   constants::visual::FALLBACK_PLAYER_G,
+                                   constants::visual::FALLBACK_PLAYER_B,
                                    255);
             SDL_RenderFillRect(game->renderer, &player_rect);
         }
@@ -461,9 +261,9 @@ void game_render(Game *game) {
             };
 
             SDL_SetRenderDrawColor(game->renderer,
-                                   constants::visual::kProjectileR,
-                                   constants::visual::kProjectileG,
-                                   constants::visual::kProjectileB,
+                                   constants::visual::PROJECTILE_R,
+                                   constants::visual::PROJECTILE_G,
+                                   constants::visual::PROJECTILE_B,
                                    255);
             SDL_RenderFillRect(game->renderer, &shot);
         }
@@ -479,16 +279,15 @@ void game_render(Game *game) {
         font_render(&game->font,
                     game->renderer,
                     "Time: " + std::to_string(remaining_time),
-                    constants::hud::kTimeTextY,
-                    constants::hud::kHudScale,
+                    constants::hud::TIME_TEXT_Y,
+                    constants::hud::HUD_SCALE,
                     START);
         font_render(&game->font,
                     game->renderer,
                     "Enemies: 5",
-                    constants::hud::kEnemiesTextY,
-                    constants::hud::kHudScale,
+                    constants::hud::ENEMIES_TEXT_Y,
+                    constants::hud::HUD_SCALE,
                     START);
-
     }
 
     SDL_RenderPresent(game->renderer);
@@ -499,7 +298,7 @@ void game_cleanup(Game *game) {
         return;
     }
 
-    for (int direction = 0; direction < kPlayerDirections; ++direction) {
+    for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
         if (game->player_direction_textures[direction]) {
             SDL_DestroyTexture(game->player_direction_textures[direction]);
             game->player_direction_textures[direction] = nullptr;

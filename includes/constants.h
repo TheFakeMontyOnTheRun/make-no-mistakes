@@ -3,85 +3,85 @@
 
 namespace constants {
 namespace math {
-constexpr float kPi = 3.14159265359f;
-constexpr float kHalf = 0.5f;
+constexpr float PI = 3.14159265359f;
+constexpr float HALF = 0.5f;
 } // namespace math
 
 namespace app {
-constexpr const char* kWindowTitle = "Make no Mistakes";
-constexpr int kScreenWidth = 1600;
-constexpr int kScreenHeight = 900;
+constexpr const char* WINDOW_TITLE = "Make no Mistakes";
+constexpr int SCREEN_WIDTH = 1600;
+constexpr int SCREEN_HEIGHT = 900;
 } // namespace app
 
 namespace world {
-constexpr int kBattleX = 0;
-constexpr int kBattleY = 0;
-constexpr int kBattleWidth = 1100;
-constexpr int kBattleHeight = 900;
+constexpr int BATTLE_X = 0;
+constexpr int BATTLE_Y = 0;
+constexpr int BATTLE_WIDTH = 1100;
+constexpr int BATTLE_HEIGHT = 900;
 
-constexpr int kPuzzleX = 1100;
-constexpr int kPuzzleY = 0;
-constexpr int kPuzzleWidth = 500;
-constexpr int kPuzzleHeight = 900;
+constexpr int PUZZLE_X = 1100;
+constexpr int PUZZLE_Y = 0;
+constexpr int PUZZLE_WIDTH = 500;
+constexpr int PUZZLE_HEIGHT = 900;
 
-constexpr int kCrateMinX = 1150;
-constexpr int kCrateMaxX = 1550;
-constexpr int kCrateMinY = 50;
-constexpr int kCrateMaxY = 850;
-constexpr int kCrateSize = 64;
+constexpr int CRATE_MIN_X = 1150;
+constexpr int CRATE_MAX_X = 1550;
+constexpr int CRATE_MIN_Y = 50;
+constexpr int CRATE_MAX_Y = 850;
+constexpr int CRATE_SIZE = 64;
 } // namespace world
 
 namespace player {
-constexpr float kStartX = 100.0f;
-constexpr float kStartY = 100.0f;
-constexpr float kSpeed = 180.0f;
-constexpr float kCollisionWidth = 32.0f;
-constexpr float kCollisionHeight = 32.0f;
-constexpr int kRenderWidth = 64;
-constexpr int kRenderHeight = 64;
-constexpr float kProjectileSpawnOffset = 22.0f;
+constexpr float START_X = 100.0f;
+constexpr float START_Y = 100.0f;
+constexpr float SPEED = 180.0f;
+constexpr float COLLISION_WIDTH = 32.0f;
+constexpr float COLLISION_HEIGHT = 32.0f;
+constexpr int RENDER_WIDTH = 64;
+constexpr int RENDER_HEIGHT = 64;
+constexpr float PROJECTILE_SPAWN_OFFSET = 22.0f;
 } // namespace player
 
 namespace projectile {
-constexpr int kMaxProjectiles = 5;
-constexpr float kSpeed = 500.0f;
-constexpr float kRadius = 3.0f;
+constexpr int MAX_PROJECTILES = 5;
+constexpr float SPEED = 500.0f;
+constexpr float RADIUS = 3.0f;
 } // namespace projectile
 
 namespace hud {
-constexpr int kTimerSeconds = 60;
-constexpr int kInitialTitleY = 100;
-constexpr int kInitialInstructionsY = 200;
-constexpr int kInitialStartY = 300;
-constexpr float kInitialTitleScale = 3.0f;
-constexpr float kInitialTextScale = 2.0f;
-constexpr int kTimeTextY = 10;
-constexpr int kEnemiesTextY = 30;
-constexpr float kHudScale = 1.5f;
+constexpr int TIMER_SECONDS = 60;
+constexpr int INITIAL_TITLE_Y = 100;
+constexpr int INITIAL_INSTRUCTIONS_Y = 200;
+constexpr int INITIAL_START_Y = 300;
+constexpr float INITIAL_TITLE_SCALE = 3.0f;
+constexpr float INITIAL_TEXT_SCALE = 2.0f;
+constexpr int TIME_TEXT_Y = 10;
+constexpr int ENEMIES_TEXT_Y = 30;
+constexpr float HUD_SCALE = 1.5f;
 } // namespace hud
 
 namespace font {
-constexpr int kGlyphSize = 8;
-constexpr int kGlyphSpacing = 1;
-constexpr int kSpaceWidth = 4;
-constexpr int kDefaultStartX = 50;
+constexpr int GLYPH_SIZE = 8;
+constexpr int GLYPH_SPACING = 1;
+constexpr int SPACE_WIDTH = 4;
+constexpr int DEFAULT_START_X = 50;
 } // namespace font
 
 namespace visual {
-constexpr int kBackgroundR = 20;
-constexpr int kBackgroundG = 20;
-constexpr int kBackgroundB = 30;
+constexpr int BACKGROUND_R = 20;
+constexpr int BACKGROUND_G = 20;
+constexpr int BACKGROUND_B = 30;
 
-constexpr int kFallbackPlayerR = 80;
-constexpr int kFallbackPlayerG = 200;
-constexpr int kFallbackPlayerB = 120;
+constexpr int FALLBACK_PLAYER_R = 80;
+constexpr int FALLBACK_PLAYER_G = 200;
+constexpr int FALLBACK_PLAYER_B = 120;
 
-constexpr int kProjectileR = 29;
-constexpr int kProjectileG = 206;
-constexpr int kProjectileB = 2;
+constexpr int PROJECTILE_R = 29;
+constexpr int PROJECTILE_G = 206;
+constexpr int PROJECTILE_B = 2;
 
-constexpr int kCheckerboardThreshold = 180;
-constexpr int kCheckerboardTolerance = 18;
+constexpr int CHECKERBOARD_THRESHOLD = 180;
+constexpr int CHECKERBOARD_TOLERANCE = 18;
 } // namespace visual
 } // namespace constants
 

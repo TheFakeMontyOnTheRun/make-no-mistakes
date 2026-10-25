@@ -1,16 +1,17 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
-#include "constants.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdbool.h>
 
+#include "constants.h"
 
-#define MAX_PROJECTILES constants::projectile::kMaxProjectiles
+typedef struct Game Game;
+
+#define MAX_PROJECTILES constants::projectile::MAX_PROJECTILES
 
 typedef struct Projectile {
     float x;
@@ -24,6 +25,8 @@ typedef struct Projectile {
 
 void projectile_init(Projectile *projectile, float x, float y, float dir_x, float dir_y, float speed);
 void projectile_update(Projectile *projectile, float dt);
+void fire_projectile(Game *game);
+void cleanup_inactive_projectiles(Game *game);
 
 #ifdef __cplusplus
 }

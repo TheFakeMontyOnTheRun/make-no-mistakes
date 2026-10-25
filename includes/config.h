@@ -8,9 +8,9 @@
 #include "constants.h"
 
 struct Config {
-    const char* window_title = constants::app::kWindowTitle;
-    int screen_width = constants::app::kScreenWidth;
-    int screen_height = constants::app::kScreenHeight;
+    const char* window_title = constants::app::WINDOW_TITLE;
+    int screen_width = constants::app::SCREEN_WIDTH;
+    int screen_height = constants::app::SCREEN_HEIGHT;
 };
 
 #endif //BLANK_CONFIG_H
