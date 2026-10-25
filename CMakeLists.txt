@@ -12,6 +12,7 @@ find_package(SDL2_image REQUIRED)
 include_directories(
     ${SDL2_INCLUDE_DIR}
     ${SDL2_IMAGE_INCLUDE_DIR}
+    ${SDL2_MIXER_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/includes
 )
 
@@ -23,6 +24,9 @@ set(SRC_FILES
     src/util.cpp
     src/font.cpp
 	src/EnemySpawner.cpp
+    src/timer.cpp
+        includes/music.h
+        src/music.cpp
 )
 
 add_executable(blank ${SRC_FILES})
@@ -30,6 +34,7 @@ add_executable(blank ${SRC_FILES})
 target_include_directories(blank PUBLIC
     ${SDL2_INCLUDE_DIR}
     ${SDL2_IMAGE_INCLUDE_DIR}
+    ${SDL2_MIXER_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/includes
 )
 
@@ -38,6 +43,7 @@ target_link_libraries(blank
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     SDL2_image
+    SDL2_mixer
     m
 )
 
