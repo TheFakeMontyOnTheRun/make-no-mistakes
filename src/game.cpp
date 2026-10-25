@@ -5,23 +5,23 @@
 #include <SDL_image.h>
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <vector>
 
-bool dragging = false;
-int offset_x = 0;
-int offset_y = 0;
+static bool dragging = false;
+static int offset_x = 0;
+static int offset_y = 0;
 
-void game_init(Game *game, const char *title, int width, int height) {
+void game_init(Game *game, const char *title, const int width, const int height) {
     if (!game) {
         return;
     }
 
     game->window = nullptr;
     game->renderer = nullptr;
-    for (int i = 0; i < PLAYER_DIRECTION_COUNT; ++i) {
-        game->player_direction_textures[i] = nullptr;
+    for (auto & player_direction_texture : game->player_direction_textures) {
+        player_direction_texture = nullptr;
     }
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -232,11 +232,11 @@ void game_render(Game *game) {
         SDL_RenderCopy(game->renderer, game->bg_battle_texture, nullptr, &game->bg_battle);
         SDL_RenderCopy(game->renderer, game->bg_puzzle_texture, nullptr, &game->bg_puzzle);
 
-        SDL_Rect player_rect = {
-            (int)game->player.x,
-            (int)game->player.y,
-            constants::player::RENDER_WIDTH,
-            constants::player::RENDER_HEIGHT
+        const SDL_Rect player_rect = {
+            .x = static_cast<int>(game->player.x),
+            .y = static_cast<int>(game->player.y),
+            .w = constants::player::RENDER_WIDTH,
+            .h = constants::player::RENDER_HEIGHT
         };
 
         SDL_Texture* player_texture =
@@ -254,10 +254,10 @@ void game_render(Game *game) {
 
         for (int i = 0; i < game->projectile_count; ++i) {
             SDL_Rect shot = {
-                (int) (game->projectiles[i].x - game->projectiles[i].radius),
-                (int) (game->projectiles[i].y - game->projectiles[i].radius),
-                (int) (game->projectiles[i].radius * 2.0f),
-                (int) (game->projectiles[i].radius * 2.0f)
+                .x = static_cast<int>(game->projectiles[i].x - game->projectiles[i].radius),
+                .y = static_cast<int>(game->projectiles[i].y - game->projectiles[i].radius),
+                .w = static_cast<int>(game->projectiles[i].radius * 2.0f),
+                .h = static_cast<int>(game->projectiles[i].radius * 2.0f)
             };
 
             SDL_SetRenderDrawColor(game->renderer,
@@ -275,7 +275,7 @@ void game_render(Game *game) {
             &game->crate_rect
         );
 
-        const int remaining_time = game->timer - (SDL_GetTicks64() - game->start_time) / 1000.0f;
+        const int remaining_time = static_cast<int>(game->timer - (SDL_GetTicks64() - game->start_time) / 1000.0f);
         font_render(&game->font,
                     game->renderer,
                     "Time: " + std::to_string(remaining_time),
@@ -298,10 +298,10 @@ void game_cleanup(Game *game) {
         return;
     }
 
-    for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
-        if (game->player_direction_textures[direction]) {
-            SDL_DestroyTexture(game->player_direction_textures[direction]);
-            game->player_direction_textures[direction] = nullptr;
+    for (auto & player_direction_texture : game->player_direction_textures) {
+        if (player_direction_texture) {
+            SDL_DestroyTexture(player_direction_texture);
+            player_direction_texture = nullptr;
         }
     }
 

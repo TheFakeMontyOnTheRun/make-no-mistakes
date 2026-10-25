@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-
 #include "constants.h"
 
 typedef struct Game Game;
