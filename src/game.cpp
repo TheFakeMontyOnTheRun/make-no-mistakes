@@ -106,13 +106,11 @@ void game_init(Game *game, const char *title, int width, int height) {
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     player_init(&game->player, 100.0f, 100.0f, 180.0f, 32.0f, 32.0f);
     game->projectile_count = 0;
-    game->timer = 60;
-    game->start_time = 0;
     game->keep_running = true;
     game->shoot_pressed = false;
-    game->show_initial_screen = true;
     game->projectile_speed = 280.0f;
     game->previous_ticks = SDL_GetPerformanceCounter();
+    game->screen = START_SCREEN;
 }
 
 void game_handle_events(Game *game) {
@@ -131,10 +129,10 @@ void game_handle_events(Game *game) {
                 game->keep_running = false;
             }
             if (event.key.keysym.sym == SDLK_SPACE) {
-                if (game->show_initial_screen) {
-                    game->show_initial_screen = false;
+                if (game->screen == START_SCREEN || game->screen == GAME_OVER_SCREEN) {
+                    game_change_screen(game);
                     SDL_SetWindowMouseRect(game->window, &game->bg_puzzle);
-                    game->start_time = SDL_GetTicks64();
+                    timer_init(&game->timer, SDL_GetTicks64(), 60);
                 } else {
                     game->shoot_pressed = true;
                 }
@@ -202,11 +200,12 @@ void game_render(Game *game) {
     SDL_SetRenderDrawColor(game->renderer, 20, 20, 30, 255);
     SDL_RenderClear(game->renderer);
 
-    if (game->show_initial_screen) {
-        font_render(&game->font, game->renderer, "Make No Mistakes", 100, 3.0f);
-        font_render(&game->font, game->renderer, "Use WASD to move SPACE to shoot", 200, 2.0f);
-        font_render(&game->font, game->renderer, "Press SPACE to start", 300, 2.0f);
-    } else {
+    if (game->screen == START_SCREEN) {
+        font_render(&game->font, game->renderer, "Make No Mistakes", 0, 100, 3.0f, true, false);
+        font_render(&game->font, game->renderer, "Use WASD to move SPACE to shoot", 0, 200, 2.0f, true, false);
+        font_render(&game->font, game->renderer, "Press SPACE to start", 0, 300, 2.0f, true, false);
+    }
+    if (game->screen == GAME_LOOP_SCREEN) {
         SDL_Rect player_rect = {
             (int) game->player.x,
             (int) game->player.y,
@@ -250,13 +249,30 @@ void game_render(Game *game) {
             &game->bg_puzzle
         );
 
-        const int remaining_time = game->timer - (SDL_GetTicks64() - game->start_time) / 1000.0f;
-        font_render(&game->font, game->renderer, "Time: " + std::to_string(remaining_time), 10, 1.5f, START);
-        font_render(&game->font, game->renderer, "Enemies: 5", 30, 1.5f, START);
+        const int remaining_time = static_cast<int>(timer_get_time_in_seconds(&game->timer));
+        const std::string time_text = "Time: " + std::to_string(remaining_time);
+        font_render(&game->font, game->renderer, time_text, 10, 10, 1.5f, false, false);
+        font_render(&game->font, game->renderer, "Enemies: 5", 10, 30, 1.5f, false, false);
+        if (remaining_time <= 0) {
+            game_change_screen(game);
+        }
+    }
 
+    if (game->screen == GAME_OVER_SCREEN) {
+        font_render(&game->font, game->renderer, "Game Over", 0, 100, 3.0f, true, false);
+        font_render(&game->font, game->renderer, "Press SPACE to restart", 0, 200, 2.0f, true, false);
     }
 
     SDL_RenderPresent(game->renderer);
+}
+
+void game_change_screen(Game* game) {
+    if (game->screen == START_SCREEN)
+        game->screen = GAME_LOOP_SCREEN;
+    else if (game->screen == GAME_LOOP_SCREEN)
+        game->screen = GAME_OVER_SCREEN;
+    else
+        game->screen = START_SCREEN;
 }
 
 void game_cleanup(Game *game) {
