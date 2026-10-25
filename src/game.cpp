@@ -83,14 +83,14 @@ void game_init(Game *game, const char *title, int width, int height) {
         game->renderer, "assets/bg/battle_area.png"
     );
     game->bg_battle = {
-        0, 0, 1100, 900
+        0, 0, 500, 500
     };
 
     game->bg_puzzle_texture = IMG_LoadTexture(
         game->renderer, "assets/bg/puzzle_area.png"
     );
     game->bg_puzzle = {
-        1100, 0, 500, 900
+        500, 0, 300, 500
     };
 
     game->crate_texture = IMG_LoadTexture(
@@ -98,9 +98,9 @@ void game_init(Game *game, const char *title, int width, int height) {
         );
 
     game->crate_rect = {
-        randomNumber(1150, 1550),
-        randomNumber(50, 850),
-        64, 64
+        randomNumber(550, 750),
+        randomNumber(50, 450),
+        32, 32
     };
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);

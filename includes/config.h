@@ -6,8 +6,8 @@
 #define BLANK_CONFIG_H
 
 struct Config {
-    int screen_width = 1600;
-    int screen_height = 900;
+    int screen_width = 800;
+    int screen_height = 500;
 };
 
 #endif //BLANK_CONFIG_H
