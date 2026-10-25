@@ -23,5 +23,8 @@ all:   $(MENU_TARGET)
 serve: $(MENU_TARGET)
 	python3 -m http.server 4422
 
+dist: $(MENU_TARGET)
+	  zip dist.zip index.html index.wasm index.js index.data
+
 clean:
 	rm -f src/*.o
