@@ -23,7 +23,7 @@ void music_manager_init(MusicManager* manager) {
     }
 
     Mix_Chunk* shoot_sound = nullptr;
-    shoot_sound = Mix_LoadWAV("assets/music/shoot_sound.mp3");
+    shoot_sound = Mix_LoadWAV("assets/music/shoot_sound.wav");
     if (!shoot_sound) {
         fprintf(stderr, "Failed to load shoot sound! SDL_mixer Error: %s\n", Mix_GetError());
     } else {
