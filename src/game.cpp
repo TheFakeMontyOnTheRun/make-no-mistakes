@@ -92,11 +92,10 @@ void game_init(Game *game, const char *title, const int width, const int height)
         constants::world::PUZZLE_HEIGHT
     };
 
-    if (randomNumber(1,2) == 1) {
-        game->active_puzzle = std::make_unique<DragCratePuzzle>(game->bg_puzzle);
-    } else {
-        game->active_puzzle = std::make_unique<ButtonClickPuzzle>(game->bg_puzzle);
-    }
+    game->puzzle_spawner = std::make_unique<PuzzleSpawner>(
+        game->bg_battle,
+        game->player
+    );
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
@@ -187,12 +186,29 @@ void game_update(Game *game, float dt) {
         projectile_update(&game->projectiles[i], dt);
     }
 
+    game->puzzle_spawner->update(dt, game->player);
+
+    if (!game->active_puzzle &&
+    game->puzzle_spawner->player_touches_terminal(game->player)) {
+
+        if (randomNumber(1,2) == 1) {
+            game->active_puzzle = std::make_unique<DragCratePuzzle>(game->bg_puzzle);
+        } else {
+            game->active_puzzle = std::make_unique<ButtonClickPuzzle>(game->bg_puzzle);
+        }
+    }
+
     if (game->active_puzzle) {
         game->active_puzzle->update(dt);
 
         if (game->active_puzzle->is_solved() || game->active_puzzle->time_remaining <= 0.0f) {
-            std::cout << "SOLVED!!!";
+            std::cout << "SOLVED!!! +"
+            << game->active_puzzle->time_remaining
+            << "s\n";
+
+            game->timer.countdown += static_cast<int>(game->active_puzzle->time_remaining);
             game->active_puzzle.reset();
+            game->puzzle_spawner->reset_cooldown();
         }
     }
 
@@ -238,6 +254,8 @@ void game_render(Game *game) {
     if (game->screen == GAME_LOOP_SCREEN) {
         SDL_RenderCopy(game->renderer, game->bg_battle_texture, nullptr, &game->bg_battle);
         SDL_RenderCopy(game->renderer, game->bg_puzzle_texture, nullptr, &game->bg_puzzle);
+
+        game->puzzle_spawner->render(game->renderer);
 
         const SDL_Rect player_rect = {
             .x = static_cast<int>(game->player.x),

@@ -29,6 +29,10 @@ set(SRC_FILES
     src/puzzle.cpp
     src/drag_crate_puzzle.cpp
     src/button_click_puzzle.cpp
+    src/puzzle.cpp
+    src/drag_crate_puzzle.cpp
+    src/button_click_puzzle.cpp
+    src/puzzle_spawner.cpp
 )
 
 add_executable(blank ${SRC_FILES})
