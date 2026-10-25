@@ -26,6 +26,9 @@ set(SRC_FILES
     src/timer.cpp
     src/music.cpp
     src/hud.cpp
+    src/puzzle.cpp
+    src/drag_crate_puzzle.cpp
+    src/button_click_puzzle.cpp
 )
 
 add_executable(blank ${SRC_FILES})
