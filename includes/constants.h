@@ -9,26 +9,26 @@ constexpr float HALF = 0.5f;
 
 namespace app {
 constexpr const char* WINDOW_TITLE = "Make no Mistakes";
-constexpr int SCREEN_WIDTH = 1600;
-constexpr int SCREEN_HEIGHT = 900;
+constexpr int SCREEN_WIDTH = 800;
+constexpr int SCREEN_HEIGHT = 500;
 } // namespace app
 
 namespace world {
 constexpr int BATTLE_X = 0;
 constexpr int BATTLE_Y = 0;
-constexpr int BATTLE_WIDTH = 1100;
-constexpr int BATTLE_HEIGHT = 900;
+constexpr int BATTLE_WIDTH = 500;
+constexpr int BATTLE_HEIGHT = 500;
 
-constexpr int PUZZLE_X = 1100;
+constexpr int PUZZLE_X = 500;
 constexpr int PUZZLE_Y = 0;
-constexpr int PUZZLE_WIDTH = 500;
-constexpr int PUZZLE_HEIGHT = 900;
+constexpr int PUZZLE_WIDTH = 300;
+constexpr int PUZZLE_HEIGHT = 500;
 
-constexpr int CRATE_MIN_X = 1150;
-constexpr int CRATE_MAX_X = 1550;
+constexpr int CRATE_MIN_X = 550;
+constexpr int CRATE_MAX_X = 750;
 constexpr int CRATE_MIN_Y = 50;
-constexpr int CRATE_MAX_Y = 850;
-constexpr int CRATE_SIZE = 64;
+constexpr int CRATE_MAX_Y = 450;
+constexpr int CRATE_SIZE = 32;
 } // namespace world
 
 namespace player {
@@ -37,8 +37,8 @@ constexpr float START_Y = 100.0f;
 constexpr float SPEED = 180.0f;
 constexpr float COLLISION_WIDTH = 32.0f;
 constexpr float COLLISION_HEIGHT = 32.0f;
-constexpr int RENDER_WIDTH = 64;
-constexpr int RENDER_HEIGHT = 64;
+constexpr int RENDER_WIDTH = 32;
+constexpr int RENDER_HEIGHT = 32;
 constexpr float PROJECTILE_SPAWN_OFFSET = 22.0f;
 } // namespace player
 
