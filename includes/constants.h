@@ -24,11 +24,9 @@ constexpr int PUZZLE_Y = 0;
 constexpr int PUZZLE_WIDTH = 300;
 constexpr int PUZZLE_HEIGHT = 500;
 
-constexpr int CRATE_MIN_X = 550;
-constexpr int CRATE_MAX_X = 750;
-constexpr int CRATE_MIN_Y = 50;
-constexpr int CRATE_MAX_Y = 450;
 constexpr int CRATE_SIZE = 32;
+    constexpr int HOLE_SIZE = 48;
+    constexpr int BUTTON_SIZE = 48;
 } // namespace world
 
 namespace player {

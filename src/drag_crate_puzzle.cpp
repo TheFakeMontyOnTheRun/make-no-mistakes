@@ -7,15 +7,39 @@
 #include <SDL_image.h>
 
 #include "constants.h"
-
+#include "util.h"
 
 
 DragCratePuzzle::DragCratePuzzle(SDL_Rect area) {
     time_remaining = 10;
     puzzle_area_limit = area;
 
-    crate_rect = {550, 100, 32, 32};
-    hole_rect = {550, 400, 48, 48};
+    crate_rect = {
+        randomNumber(
+            puzzle_area_limit.x,
+            puzzle_area_limit.x + puzzle_area_limit.w - constants::world::CRATE_SIZE
+        ),
+        randomNumber(
+            puzzle_area_limit.y,
+            puzzle_area_limit.y + puzzle_area_limit.h - constants::world::CRATE_SIZE
+        ),
+        constants::world::CRATE_SIZE,
+        constants::world::CRATE_SIZE
+    };
+    do {
+        hole_rect = {
+            randomNumber(
+                puzzle_area_limit.x,
+                puzzle_area_limit.x + puzzle_area_limit.w - constants::world::HOLE_SIZE
+            ),
+            randomNumber(
+                puzzle_area_limit.y,
+                puzzle_area_limit.y + puzzle_area_limit.h - constants::world::HOLE_SIZE
+            ),
+            constants::world::HOLE_SIZE,
+            constants::world::HOLE_SIZE
+        };
+    } while (SDL_HasIntersection(&crate_rect, &hole_rect));
 }
 
 DragCratePuzzle::~DragCratePuzzle() {

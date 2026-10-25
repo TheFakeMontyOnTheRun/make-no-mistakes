@@ -4,11 +4,25 @@
 
 #include "button_click_puzzle.h"
 
+#include "constants.h"
+#include "util.h"
+
 ButtonClickPuzzle::ButtonClickPuzzle(SDL_Rect area) {
     time_remaining = 5;
     puzzle_area_limit = area;
 
-    button_rect = {550, 100, 64, 64};
+    button_rect = {
+        randomNumber(
+            puzzle_area_limit.x,
+            puzzle_area_limit.x + puzzle_area_limit.w - constants::world::BUTTON_SIZE
+        ),
+        randomNumber(
+            puzzle_area_limit.y,
+            puzzle_area_limit.y + puzzle_area_limit.h - constants::world::BUTTON_SIZE
+        ),
+        constants::world::BUTTON_SIZE,
+        constants::world::BUTTON_SIZE
+    };
 }
 
 void ButtonClickPuzzle::handle_event(SDL_Event &event) {
