@@ -71,13 +71,13 @@ Testing/
 .idea
 
 # Ninja files
-	.ninja_deps
-	.ninja_log
-	blank
-	build.ninja
+.ninja_deps
+.ninja_log
+blank
+build.ninja
 
 # Emscripten files
-	index.data
-	index.html
-	index.js
-	index.wasm
+index.data
+index.html
+index.js
+index.wasm
