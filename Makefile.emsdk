@@ -1,0 +1,30 @@
+CC = emcc
+CXX = em++
+
+LDFLAGS =  -O3 -s USE_ZLIB=1 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -sSDL2_IMAGE_FORMATS='["png"]' -sUSE_LIBPNG=1 -sUSE_SDL=2 -sALLOW_MEMORY_GROWTH=1 --preload-file assets --use-preload-plugins -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 --shell-file ./minimal.html
+
+CXXFLAGS=-g -c -O3 -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -sSDL2_IMAGE_FORMATS='["png"]' \
+	-Iincludes \
+	$(SDL_INCLUDE)
+
+CFLAGS=-g -c -O3 -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -ssSDL2_MIXER_FORMATS='["mp3"]' -sSDL2_IMAGE_FORMATS='["png"]' \
+	-Iincludes \
+	$(SDL_INCLUDE)
+
+MENU_TARGET=index.html
+
+MENU_OBJ= src/font.o  src/game.o  src/main.o  src/player.o  src/projectile.o  src/util.o src/music.o src/timer.o
+
+$(MENU_TARGET):	$(MENU_OBJ)
+	$(CXX) -o$(MENU_TARGET) $(MENU_OBJ) $(LDFLAGS)
+
+all:   $(MENU_TARGET)
+
+serve: $(MENU_TARGET)
+	python3 -m http.server 4321
+
+dist: $(MENU_TARGET)
+	  zip dist.zip index.html index.wasm index.js index.data
+
+clean:
+	rm -f src/*.o

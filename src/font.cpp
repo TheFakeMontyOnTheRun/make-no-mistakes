@@ -49,7 +49,7 @@ void font_init(Font* font, const std::string& filepath, SDL_Renderer* renderer)
     }
 }
 
-void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, int y, float scale, TextAlign align)
+void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, int x, int y, float scale, bool center_x, bool center_y)
 {
     if (!font || !renderer || text.empty()) {
         return;
@@ -65,7 +65,8 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
 
     int text_width = 0;
     int window_width = 0;
-    SDL_GetRendererOutputSize(renderer, &window_width, nullptr);
+    int window_height = 0;
+    SDL_GetRendererOutputSize(renderer, &window_width, &window_height);
     for (const char ch : text) {
         if (ch == ' ') {
             text_width += static_cast<int>(constants::font::SPACE_WIDTH * scale);
@@ -79,12 +80,17 @@ void font_render(Font* font, SDL_Renderer* renderer, const std::string& text, in
     }
 
     int draw_x = 0;
-    if (align == CENTER) {
+    int draw_y = 0;
+    if (center_x) {
         draw_x = (window_width - text_width) / 2;
     } else {
-        draw_x = constants::font::DEFAULT_START_X;
+        draw_x = x;
     }
-    const int draw_y = y;
+    if (center_y) {
+        draw_y = (window_height - static_cast<int>(constants::font::GLYPH_SIZE * scale)) / 2;
+    } else {
+        draw_y = y;
+    }
 
     for (const char ch : text) {
         if (ch == ' ') {
