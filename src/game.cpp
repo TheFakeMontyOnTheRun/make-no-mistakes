@@ -6,8 +6,11 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <iostream>
 #include <string>
 #include <vector>
+
+#include "button_click_puzzle.h"
 
 static bool dragging = false;
 static int offset_x = 0;
@@ -92,16 +95,18 @@ void game_init(Game *game, const char *title, const int width, const int height)
         constants::world::PUZZLE_HEIGHT
     };
 
-    game->crate_texture = IMG_LoadTexture(
-        game->renderer, "assets/obj/crate.png"
-    );
+    // game->crate_texture = IMG_LoadTexture(
+    //     game->renderer, "assets/obj/crate.png"
+    // );
+    //
+    // game->crate_rect = {
+    //     randomNumber(constants::world::CRATE_MIN_X, constants::world::CRATE_MAX_X),
+    //     randomNumber(constants::world::CRATE_MIN_Y, constants::world::CRATE_MAX_Y),
+    //     constants::world::CRATE_SIZE,
+    //     constants::world::CRATE_SIZE
+    // };
 
-    game->crate_rect = {
-        randomNumber(constants::world::CRATE_MIN_X, constants::world::CRATE_MAX_X),
-        randomNumber(constants::world::CRATE_MIN_Y, constants::world::CRATE_MAX_Y),
-        constants::world::CRATE_SIZE,
-        constants::world::CRATE_SIZE
-    };
+    game->active_puzzle = std::make_unique<ButtonClickPuzzle>(game->bg_puzzle);
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
@@ -162,31 +167,36 @@ void game_handle_events(Game *game) {
             }
         }
 
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                int mouse_x = event.button.x;
-                int mouse_y = event.button.y;
+        // if (event.type == SDL_MOUSEBUTTONDOWN) {
+        //     if (event.button.button == SDL_BUTTON_LEFT) {
+        //         int mouse_x = event.button.x;
+        //         int mouse_y = event.button.y;
+        //
+        //         if (mouse_x >= game->crate_rect.x && mouse_x <= game->crate_rect.x + game->crate_rect.w &&
+        //             mouse_y >= game->crate_rect.y && mouse_y <= game->crate_rect.y + game->crate_rect.h)
+        //         {
+        //             dragging = true;
+        //             offset_x = mouse_x - game->crate_rect.x;
+        //             offset_y = mouse_y - game->crate_rect.y;
+        //         }
+        //     }
+        // }
+        //
+        // if (event.type == SDL_MOUSEBUTTONUP) {
+        //     if (event.button.button == SDL_BUTTON_LEFT) {
+        //         dragging = false;
+        //     }
+        // }
+        //
+        // if (event.type == SDL_MOUSEMOTION && dragging) {
+        //     game->crate_rect.x = event.motion.x - offset_x;
+        //     game->crate_rect.y = event.motion.y - offset_y;
+        // }
 
-                if (mouse_x >= game->crate_rect.x && mouse_x <= game->crate_rect.x + game->crate_rect.w &&
-                    mouse_y >= game->crate_rect.y && mouse_y <= game->crate_rect.y + game->crate_rect.h)
-                {
-                    dragging = true;
-                    offset_x = mouse_x - game->crate_rect.x;
-                    offset_y = mouse_y - game->crate_rect.y;
-                }
-            }
+        if (game->active_puzzle) {
+            game->active_puzzle->handle_event(event);
         }
 
-        if (event.type == SDL_MOUSEBUTTONUP) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                dragging = false;
-            }
-        }
-
-        if (event.type == SDL_MOUSEMOTION && dragging) {
-            game->crate_rect.x = event.motion.x - offset_x;
-            game->crate_rect.y = event.motion.y - offset_y;
-        }
     }
 }
 
@@ -211,6 +221,15 @@ void game_update(Game *game, float dt) {
 
     for (int i = 0; i < game->projectile_count; ++i) {
         projectile_update(&game->projectiles[i], dt);
+    }
+
+    if (game->active_puzzle) {
+        game->active_puzzle->update(dt);
+
+        if (game->active_puzzle->is_solved() || game->active_puzzle->time_remaining <= 0.0f) {
+            std::cout << "SOLVED!!!";
+            game->active_puzzle.reset();
+        }
     }
 
     cleanup_inactive_projectiles(game);
@@ -292,12 +311,16 @@ void game_render(Game *game) {
             SDL_RenderFillRect(game->renderer, &shot);
         }
 
-        SDL_RenderCopy(
-            game->renderer,
-            game->crate_texture,
-            nullptr,
-            &game->crate_rect
-        );
+        // SDL_RenderCopy(
+        //     game->renderer,
+        //     game->crate_texture,
+        //     nullptr,
+        //     &game->crate_rect
+        // );
+
+        if (game->active_puzzle) {
+            game->active_puzzle->render(game->renderer);
+        }
 
         const int remaining_time = static_cast<int>(timer_get_time_in_seconds(&game->timer));
         font_render(&game->font,
