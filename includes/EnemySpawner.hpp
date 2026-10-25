@@ -27,7 +27,7 @@ extern "C" {
             : m_head{head}, m_neck{neck}, m_belly{belly}, m_legs{legs}, m_x{x},
               m_y{y} {}
 
-        virtual ~Enemy() {}
+        virtual ~Enemy() noexcept {}
 		Enemy(const Enemy &other) = delete;
 		Enemy(const Enemy &&other) = delete;
 		Enemy& operator=(Enemy&& other) = delete;
@@ -53,7 +53,7 @@ extern "C" {
         SDL_Renderer *m_renderer;
 	public:
 		explicit EnemySpawner(SDL_Renderer *renderer, float interval, std::function<void(Enemy*)> callback) noexcept;
-		virtual ~EnemySpawner();
+		virtual ~EnemySpawner() noexcept;
 		EnemySpawner(const EnemySpawner &other) = delete;
 		EnemySpawner(const EnemySpawner &&other) = delete;
 		EnemySpawner& operator=(EnemySpawner&& other) = delete;
