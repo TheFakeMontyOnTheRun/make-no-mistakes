@@ -104,6 +104,7 @@ void game_init(Game *game, const char *title, const int width, const int height)
     };
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
+    hud_init(&game->hud);
     for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
         char path[128];
         snprintf(path, sizeof(path), "assets/player/directions/%s_0.png",
@@ -298,6 +299,9 @@ void game_render(Game *game) {
             nullptr,
             &game->crate_rect
         );
+
+        hud_change_hp(&game->hud, player_health_percentage(&game->player));
+        hud_render(game->renderer, &game->hud);
 
         const int remaining_time = static_cast<int>(timer_get_time_in_seconds(&game->timer));
         font_render(&game->font,

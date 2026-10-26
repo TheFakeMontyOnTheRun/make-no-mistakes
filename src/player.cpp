@@ -186,7 +186,6 @@ void player_init(Player *player, float x, float y, float speed, float width, flo
     player->health.current = constants::player::START_HEALTH;
     player->health.max = constants::player::MAX_HEALTH;
     player->health.invulnerability_timer = 0.0f;
-    player->health.alive = true;
 }
 
 void player_move(Player *player, float move_x, float move_y, float dt) {
@@ -248,12 +247,10 @@ void player_update_health(Player *player, float dt) {
     if (player->health.invulnerability_timer > 0.0f) {
         player->health.invulnerability_timer = std::max(0.0f, player->health.invulnerability_timer - dt);
     }
-
-    player->health.alive = player->health.current > 0;
 }
 
 void player_take_damage(Player *player, int amount) {
-    if (!player || !player->health.alive) {
+    if (!player || player->health.current <= 0) {
         return;
     }
 
@@ -263,7 +260,6 @@ void player_take_damage(Player *player, int amount) {
 
     player->health.current = std::max(0, player->health.current - amount);
     player->health.invulnerability_timer = constants::player::INVULNERABILITY_TIME;
-    player->health.alive = player->health.current > 0;
 }
 
 int player_health(const Player *player) {
@@ -284,7 +280,7 @@ bool player_is_alive(const Player *player) {
     if (!player) {
         return false;
     }
-    return player->health.alive;
+    return player->health.current > 0;
 }
 
 double player_health_percentage(const Player *player) {

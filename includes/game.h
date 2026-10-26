@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "font.h"
+#include "hud.h"
 #include "player.h"
 #include "projectile.h"
 #include "timer.h"
@@ -31,6 +32,7 @@ typedef struct Game {
     SDL_Rect crate_rect;
     SDL_Texture *player_direction_textures[8];
     Font font;
+    Hud hud;
     Player player;
     Projectile projectiles[MAX_PROJECTILES];
     int projectile_count;

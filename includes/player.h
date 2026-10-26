@@ -20,7 +20,6 @@ typedef struct Health {
     int current;
     int max;
     float invulnerability_timer;
-    bool alive;
 } Health;
 
 typedef struct Player {
