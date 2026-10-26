@@ -6,6 +6,7 @@
 
 #include "font.h"
 #include "hud.h"
+#include "music.h"
 #include "player.h"
 #include "projectile.h"
 #include "timer.h"
@@ -34,6 +35,7 @@ typedef struct Game {
     Font font;
     Hud hud;
     Player player;
+    MusicManager music_manager;
     Projectile projectiles[MAX_PROJECTILES];
     int projectile_count;
     Timer timer;

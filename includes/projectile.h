@@ -2,10 +2,9 @@
 #define PROJECTILE_H
 
 #ifdef __cplusplus
+#include "constants.h"
 extern "C" {
 #endif
-
-#include "constants.h"
 
 typedef struct Game Game;
 

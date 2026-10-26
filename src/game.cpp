@@ -22,6 +22,8 @@ void game_change_screen(Game *game) {
         game->screen = GAME_LOOP_SCREEN;
     } else if (game->screen == GAME_LOOP_SCREEN) {
         game->screen = GAME_OVER_SCREEN;
+    } else {
+        game->screen = START_SCREEN;
     }
 }
 
@@ -105,6 +107,7 @@ void game_init(Game *game, const char *title, const int width, const int height)
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     hud_init(&game->hud);
+    music_manager_init(&game->music_manager);
     for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
         char path[128];
         snprintf(path, sizeof(path), "assets/player/directions/%s_0.png",
@@ -126,7 +129,7 @@ void game_init(Game *game, const char *title, const int width, const int height)
     game->projectile_speed = constants::projectile::SPEED;
     game->shoot_cooldown = 0.18f;
     game->shoot_timer = 0.0f;
-    timer_init(&game->timer, SDL_GetTicks64(), constants::hud::TIMER_SECONDS);
+    //timer_init(&game->timer, SDL_GetTicks64(), constants::hud::TIMER_SECONDS);
     game->screen = START_SCREEN;
     game->previous_ticks = SDL_GetPerformanceCounter();
 }
