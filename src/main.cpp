@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 
     Config config;
-    game_init(&game, "Make no Mistakes", config.screen_width, config.screen_height);
+    game_init(&game, config.window_title, config.screen_width, config.screen_height);
 
     if (!game.window || !game.renderer) {
         return 1;

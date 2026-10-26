@@ -1,14 +1,19 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <SDL.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <SDL.h>
-#include <stdbool.h>
+enum {
+    PLAYER_DIRECTION_COUNT = 8
+};
 
-#include "projectile.h"
+extern const char* const PLAYER_DIRECTION_NAMES[PLAYER_DIRECTION_COUNT];
+
+SDL_Texture* load_player_texture(SDL_Renderer* renderer, const char* filepath);
 
 typedef struct Player {
     float x;
@@ -20,6 +25,9 @@ typedef struct Player {
     float velocity_y;
     float facing_x;
     float facing_y;
+    int sprite_frame;
+    float animation_time;
+    bool moving;
 } Player;
 
 void player_init(Player *player, float x, float y, float speed, float width, float height);
