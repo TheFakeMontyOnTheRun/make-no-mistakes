@@ -6,8 +6,6 @@
 extern "C" {
 #endif
 
-#include "constants.h"
-
 typedef struct Game Game;
 
 #define MAX_PROJECTILES constants::projectile::MAX_PROJECTILES

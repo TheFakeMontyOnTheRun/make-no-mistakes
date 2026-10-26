@@ -50,6 +50,7 @@ void fire_projectile(Game *game) {
     );
 
     game->projectile_count++;
+    music_manager_play_sound(&game->music_manager, "shoot");
 }
 
 void cleanup_inactive_projectiles(Game *game) {
