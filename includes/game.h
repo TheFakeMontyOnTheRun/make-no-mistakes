@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <memory>
 #include <SDL.h>
 #include <stdbool.h>
 
@@ -9,6 +10,8 @@
 #include "player.h"
 #include "projectile.h"
 #include "timer.h"
+#include "puzzle.h"
+#include "puzzle_spawner.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +33,9 @@ typedef struct Game {
 
     SDL_Texture *crate_texture;
     SDL_Rect crate_rect;
+    std::unique_ptr<PuzzleSpawner> puzzle_spawner;
+    std::unique_ptr<Puzzle> active_puzzle;
+
     SDL_Texture *player_direction_textures[8];
     Font font;
     Hud hud;

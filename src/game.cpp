@@ -6,12 +6,12 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <iostream>
 #include <string>
 #include <vector>
 
-static bool dragging = false;
-static int offset_x = 0;
-static int offset_y = 0;
+#include "button_click_puzzle.h"
+#include "drag_crate_puzzle.h"
 
 void game_change_screen(Game *game) {
     if (!game) {
@@ -92,16 +92,10 @@ void game_init(Game *game, const char *title, const int width, const int height)
         constants::world::PUZZLE_HEIGHT
     };
 
-    game->crate_texture = IMG_LoadTexture(
-        game->renderer, "assets/obj/crate.png"
+    game->puzzle_spawner = std::make_unique<PuzzleSpawner>(
+        game->bg_battle,
+        game->player
     );
-
-    game->crate_rect = {
-        randomNumber(constants::world::CRATE_MIN_X, constants::world::CRATE_MAX_X),
-        randomNumber(constants::world::CRATE_MIN_Y, constants::world::CRATE_MAX_Y),
-        constants::world::CRATE_SIZE,
-        constants::world::CRATE_SIZE
-    };
 
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     hud_init(&game->hud);
@@ -163,31 +157,10 @@ void game_handle_events(Game *game) {
             }
         }
 
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                int mouse_x = event.button.x;
-                int mouse_y = event.button.y;
-
-                if (mouse_x >= game->crate_rect.x && mouse_x <= game->crate_rect.x + game->crate_rect.w &&
-                    mouse_y >= game->crate_rect.y && mouse_y <= game->crate_rect.y + game->crate_rect.h)
-                {
-                    dragging = true;
-                    offset_x = mouse_x - game->crate_rect.x;
-                    offset_y = mouse_y - game->crate_rect.y;
-                }
-            }
+        if (game->active_puzzle) {
+            game->active_puzzle->handle_event(event);
         }
 
-        if (event.type == SDL_MOUSEBUTTONUP) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                dragging = false;
-            }
-        }
-
-        if (event.type == SDL_MOUSEMOTION && dragging) {
-            game->crate_rect.x = event.motion.x - offset_x;
-            game->crate_rect.y = event.motion.y - offset_y;
-        }
     }
 }
 
@@ -212,6 +185,32 @@ void game_update(Game *game, float dt) {
 
     for (int i = 0; i < game->projectile_count; ++i) {
         projectile_update(&game->projectiles[i], dt);
+    }
+
+    game->puzzle_spawner->update(dt, game->player);
+
+    if (!game->active_puzzle &&
+    game->puzzle_spawner->player_touches_terminal(game->player)) {
+
+        if (randomNumber(1,2) == 1) {
+            game->active_puzzle = std::make_unique<DragCratePuzzle>(game->bg_puzzle);
+        } else {
+            game->active_puzzle = std::make_unique<ButtonClickPuzzle>(game->bg_puzzle);
+        }
+    }
+
+    if (game->active_puzzle) {
+        game->active_puzzle->update(dt);
+
+        if (game->active_puzzle->is_solved() || game->active_puzzle->time_remaining <= 0.0f) {
+            std::cout << "SOLVED!!! +"
+            << game->active_puzzle->time_remaining
+            << "s\n";
+
+            game->timer.countdown += static_cast<int>(game->active_puzzle->time_remaining);
+            game->active_puzzle.reset();
+            game->puzzle_spawner->reset_cooldown();
+        }
     }
 
     cleanup_inactive_projectiles(game);
@@ -257,6 +256,8 @@ void game_render(Game *game) {
         SDL_RenderCopy(game->renderer, game->bg_battle_texture, nullptr, &game->bg_battle);
         SDL_RenderCopy(game->renderer, game->bg_puzzle_texture, nullptr, &game->bg_puzzle);
 
+        game->puzzle_spawner->render(game->renderer);
+
         const SDL_Rect player_rect = {
             .x = static_cast<int>(game->player.x),
             .y = static_cast<int>(game->player.y),
@@ -293,12 +294,9 @@ void game_render(Game *game) {
             SDL_RenderFillRect(game->renderer, &shot);
         }
 
-        SDL_RenderCopy(
-            game->renderer,
-            game->crate_texture,
-            nullptr,
-            &game->crate_rect
-        );
+        if (game->active_puzzle) {
+            game->active_puzzle->render(game->renderer);
+        }
 
         hud_change_hp(&game->hud, player_health_percentage(&game->player));
         hud_render(game->renderer, &game->hud);
@@ -320,7 +318,6 @@ void game_render(Game *game) {
                     constants::hud::HUD_SCALE,
                     false,
                     false);
-
         if (remaining_time <= 0) {
             game_change_screen(game);
         }
