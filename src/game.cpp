@@ -22,6 +22,23 @@ void game_change_screen(Game *game) {
         game->screen = GAME_LOOP_SCREEN;
     } else if (game->screen == GAME_LOOP_SCREEN) {
         game->screen = GAME_OVER_SCREEN;
+        SDL_SetWindowMouseRect(game->window, nullptr);
+        game->active_puzzle.reset();
+    } else if (game->screen == GAME_OVER_SCREEN) {
+        game->screen = GAME_LOOP_SCREEN;
+        player_init(&game->player,
+                    constants::player::START_X,
+                    constants::player::START_Y,
+                    constants::player::SPEED,
+                    constants::player::COLLISION_WIDTH,
+                    constants::player::COLLISION_HEIGHT);
+        game->projectile_count = 0;
+        game->shoot_pressed = false;
+        game->shoot_timer = 0.0f;
+        game->active_puzzle.reset();
+        if (game->puzzle_spawner) {
+            game->puzzle_spawner->reset_cooldown();
+        }
     }
 }
 
@@ -92,11 +109,6 @@ void game_init(Game *game, const char *title, const int width, const int height)
         constants::world::PUZZLE_HEIGHT
     };
 
-    game->puzzle_spawner = std::make_unique<PuzzleSpawner>(
-        game->bg_battle,
-        game->player
-    );
-
     font_init(&game->font, "assets/fonts/font_spritesheet.png", game->renderer);
     hud_init(&game->hud);
     for (int direction = 0; direction < PLAYER_DIRECTION_COUNT; ++direction) {
@@ -113,6 +125,11 @@ void game_init(Game *game, const char *title, const int width, const int height)
                 constants::player::SPEED,
                 constants::player::COLLISION_WIDTH,
                 constants::player::COLLISION_HEIGHT);
+
+    game->puzzle_spawner = std::make_unique<PuzzleSpawner>(
+        game->bg_battle,
+        game->player
+    );
     game->projectile_count = 0;
     game->keep_running = true;
     game->shoot_pressed = false;
@@ -165,14 +182,14 @@ void game_handle_events(Game *game) {
 }
 
 void game_update(Game *game, float dt) {
-    if (!game) {
+    if (!game || game->screen != GAME_LOOP_SCREEN) {
         return;
     }
 
     const Uint8 *keyboard_state = SDL_GetKeyboardState(nullptr);
     player_update(&game->player, keyboard_state, dt);
 
-    if (game->screen == GAME_LOOP_SCREEN && game->shoot_pressed &&
+    if (game->shoot_pressed &&
         (keyboard_state[SDL_SCANCODE_SPACE] || keyboard_state[SDL_SCANCODE_KP_0])) {
         game->shoot_timer -= dt;
         if (game->shoot_timer <= 0.0f) {
@@ -335,6 +352,10 @@ void game_render(Game *game) {
 void game_cleanup(Game *game) {
     if (!game) {
         return;
+    }
+
+    if (game->window) {
+        SDL_SetWindowMouseRect(game->window, nullptr);
     }
 
     for (auto & player_direction_texture : game->player_direction_textures) {
