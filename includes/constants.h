@@ -39,7 +39,10 @@ constexpr float COLLISION_WIDTH = 32.0f;
 constexpr float COLLISION_HEIGHT = 32.0f;
 constexpr int RENDER_WIDTH = 64;
 constexpr int RENDER_HEIGHT = 64;
+constexpr int MAX_HEALTH = 100;
+constexpr int START_HEALTH = MAX_HEALTH;
 constexpr float PROJECTILE_SPAWN_OFFSET = 22.0f;
+constexpr float INVULNERABILITY_TIME = 0.5f;
 } // namespace player
 
 namespace projectile {
