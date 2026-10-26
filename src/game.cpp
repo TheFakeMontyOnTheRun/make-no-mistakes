@@ -1,6 +1,7 @@
 #include "game.h"
 #include "constants.h"
 #include "util.h"
+#include "EnemySpawner.hpp"
 
 #include <SDL_image.h>
 
@@ -13,13 +14,28 @@
 #include "button_click_puzzle.h"
 #include "drag_crate_puzzle.h"
 
+
+EnemySpawner *enemySpawner;
+std::vector<Enemy*> enemies;
+
+static bool dragging = false;
+static int offset_x = 0;
+static int offset_y = 0;
+
+
+
 void game_change_screen(Game *game) {
     if (!game) {
         return;
     }
 
     if (game->screen == START_SCREEN) {
-        game->screen = GAME_LOOP_SCREEN;
+		game->screen = GAME_LOOP_SCREEN;
+
+        enemySpawner = new EnemySpawner(game->renderer, 2, [](Enemy *foe) {
+			enemies.emplace_back(foe);
+		});
+
     } else if (game->screen == GAME_LOOP_SCREEN) {
         game->screen = GAME_OVER_SCREEN;
     }
@@ -169,6 +185,12 @@ void game_update(Game *game, float dt) {
         return;
     }
 
+    if (!enemySpawner) {
+		return;
+    }
+
+    enemySpawner->update(dt);
+
     const Uint8 *keyboard_state = SDL_GetKeyboardState(nullptr);
     player_update(&game->player, keyboard_state, dt);
 
@@ -301,6 +323,20 @@ void game_render(Game *game) {
         hud_change_hp(&game->hud, player_health_percentage(&game->player));
         hud_render(game->renderer, &game->hud);
 
+        for (const auto &foe : enemies) {
+
+			SDL_Rect foe_head  = {(int)foe->m_x, (int)foe->m_y +  0, (int)32, (int)32};
+			SDL_Rect foe_neck  = {(int)foe->m_x, (int)foe->m_y + 10, (int)32, (int)32};
+			SDL_Rect foe_belly = {(int)foe->m_x, (int)foe->m_y + 32, (int)32, (int)32};
+			SDL_Rect foe_legs  = {(int)foe->m_x, (int)foe->m_y + 64, (int)32, (int)32};
+
+			SDL_RenderCopy(game->renderer, foe->m_neck, nullptr, &foe_neck);
+			SDL_RenderCopy(game->renderer, foe->m_belly, nullptr, &foe_belly);
+			SDL_RenderCopy(game->renderer, foe->m_legs, nullptr, &foe_legs);
+
+			SDL_RenderCopy(game->renderer, foe->m_head, nullptr, &foe_head);
+		}
+
         const int remaining_time = static_cast<int>(timer_get_time_in_seconds(&game->timer));
         font_render(&game->font,
                     game->renderer,
@@ -330,7 +366,6 @@ void game_render(Game *game) {
 
     SDL_RenderPresent(game->renderer);
 }
-
 
 void game_cleanup(Game *game) {
     if (!game) {

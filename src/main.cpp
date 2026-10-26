@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <ctime>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
@@ -26,6 +27,9 @@ void mainLoop (void) {
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
+
+
+    srand(time(NULL));
 
     Config config;
     game_init(&game, config.window_title, config.screen_width, config.screen_height);

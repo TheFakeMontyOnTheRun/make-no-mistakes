@@ -24,6 +24,7 @@ set(SRC_FILES
     src/projectile.cpp
     src/util.cpp
     src/font.cpp
+	src/EnemySpawner.cpp
     src/timer.cpp
     src/music.cpp
     src/hud.cpp

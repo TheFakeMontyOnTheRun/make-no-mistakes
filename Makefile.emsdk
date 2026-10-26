@@ -13,7 +13,6 @@ CFLAGS=-g -c -O3 -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -ssSDL2_MIXER_F
 
 MENU_TARGET=index.html
 
-
 MENU_OBJ= src/font.o \
 		  src/game.o \
 		  src/main.o \
@@ -27,7 +26,7 @@ MENU_OBJ= src/font.o \
     src/drag_crate_puzzle.o \
     src/button_click_puzzle.o \
     src/puzzle_spawner.o \
-
+	src/EnemySpawner.o
 
 $(MENU_TARGET):	$(MENU_OBJ)
 	$(CXX) -o$(MENU_TARGET) $(MENU_OBJ) $(LDFLAGS)
