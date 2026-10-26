@@ -24,8 +24,8 @@ set(SRC_FILES
     src/util.cpp
     src/font.cpp
     src/timer.cpp
-        includes/music.h
-        src/music.cpp
+    src/music.cpp
+    src/hud.cpp
 )
 
 add_executable(blank ${SRC_FILES})
