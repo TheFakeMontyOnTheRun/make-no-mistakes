@@ -8,6 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_fi
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 include_directories(
     ${SDL2_INCLUDE_DIR}
@@ -26,9 +27,6 @@ set(SRC_FILES
     src/timer.cpp
     src/music.cpp
     src/hud.cpp
-    src/puzzle.cpp
-    src/drag_crate_puzzle.cpp
-    src/button_click_puzzle.cpp
     src/puzzle.cpp
     src/drag_crate_puzzle.cpp
     src/button_click_puzzle.cpp
