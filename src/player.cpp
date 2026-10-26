@@ -183,6 +183,9 @@ void player_init(Player *player, float x, float y, float speed, float width, flo
     player->sprite_frame = sprite_frame_for_direction(player->facing_x, player->facing_y);
     player->animation_time = 0.0f;
     player->moving = false;
+    player->health.current = constants::player::START_HEALTH;
+    player->health.max = constants::player::MAX_HEALTH;
+    player->health.invulnerability_timer = 0.0f;
 }
 
 void player_move(Player *player, float move_x, float move_y, float dt) {
@@ -233,4 +236,57 @@ void player_update(Player *player, const Uint8 *key_state, float dt) {
     }
 
     player_move(player, move_x, move_y, dt);
+    player_update_health(player, dt);
+}
+
+void player_update_health(Player *player, float dt) {
+    if (!player) {
+        return;
+    }
+
+    if (player->health.invulnerability_timer > 0.0f) {
+        player->health.invulnerability_timer = std::max(0.0f, player->health.invulnerability_timer - dt);
+    }
+}
+
+void player_take_damage(Player *player, int amount) {
+    if (!player || player->health.current <= 0) {
+        return;
+    }
+
+    if (player->health.invulnerability_timer > 0.0f) {
+        return;
+    }
+
+    player->health.current = std::max(0, player->health.current - amount);
+    player->health.invulnerability_timer = constants::player::INVULNERABILITY_TIME;
+}
+
+int player_health(const Player *player) {
+    if (!player) {
+        return 0;
+    }
+    return player->health.current;
+}
+
+int player_max_health(const Player *player) {
+    if (!player) {
+        return 0;
+    }
+    return player->health.max;
+}
+
+bool player_is_alive(const Player *player) {
+    if (!player) {
+        return false;
+    }
+    return player->health.current > 0;
+}
+
+double player_health_percentage(const Player *player) {
+    if (!player || player->health.max <= 0) {
+        return 0.0;
+    }
+
+    return static_cast<double>(player->health.current) / static_cast<double>(player->health.max);
 }
